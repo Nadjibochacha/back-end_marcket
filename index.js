@@ -71,7 +71,7 @@ app.post('/stock', async (req, res) => {
 // Get all stock items
 app.get('/stock', async (req, res) => {
   try {
-    const result = await pool.query("SELECT product_id, name, TO_CHAR(expiration, 'DD-MM-YYYY') AS formatted_expiration, quantity, price, catigory FROM stock ORDER BY expiration");
+    const result = await pool.query("SELECT product_id, name, TO_CHAR(expiration, 'DD-MM-YYYY') AS formatted_expiration, quantity, price, cost, catigory FROM stock ORDER BY expiration");
     res.status(200).json(result.rows)
 
   } catch (err) {
@@ -82,14 +82,14 @@ app.get('/stock', async (req, res) => {
 // update item from stock
 app.put('/stock/:id', async (req, res) => {
   const id = req.params.id;
-  const { name, quantity, expiration, price, category } = req.body;
+  const { name, quantity, expiration, price, category, cost } = req.body;
 
   try {
     const result = await pool.query(
       `UPDATE stock
-       SET name = $1, quantity = $2, expiration = $3, price = $4, catigory = $5
-       WHERE product_id = $6 RETURNING *`,
-      [name, quantity, expiration, price, category, id]
+       SET name = $1, quantity = $2, expiration = $3, price = $4, catigory = $5, cost = $6
+       WHERE product_id = $7 RETURNING *`,
+      [name, quantity, expiration, price, category, cost,id]
     );
     res.status(201).json(result.rows[0]); // Return the updated row
   } catch (error) {
